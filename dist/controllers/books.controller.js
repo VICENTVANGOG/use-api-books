@@ -30,7 +30,7 @@ export class BooksController {
             return bodyResponseGetAllBooks;
         });
     }
-    createBook(title, author, description, summary, publicationDate, token) {
+    create(title, author, description, summary, publicationDate, token) {
         return __awaiter(this, void 0, void 0, function* () {
             const newBook = {
                 title: title.value,
@@ -56,6 +56,72 @@ export class BooksController {
             }
             const bodyResponseCreateBook = yield response.json();
             return bodyResponseCreateBook;
+        });
+    }
+    getById(id, token) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const headers = {
+                'accept': '*/*',
+                'Authorization': `Bearer ${token}`
+            };
+            const requestOptions = {
+                method: 'GET',
+                headers: headers,
+            };
+            const response = yield fetch(`${this.domain}/api/v1/books/${id}`, requestOptions);
+            if (!response.ok) { // manejo de error en caso de no contar con una conexión exitosa. 
+                console.log(response);
+                throw new Error(`error al obtener libros: ${response.status} : ${response.statusText}`);
+            }
+            const BodyResponseGetById = yield response.json();
+            return BodyResponseGetById;
+        });
+    }
+    update(idCache, title, author, description, summary, publicationDate, token) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const updateBook = {
+                title: title.value,
+                author: author.value,
+                description: description.value,
+                summary: summary.value,
+                publicationDate: publicationDate.value
+            };
+            const headers = {
+                'accept': '*/*',
+                'Content-Type': 'application.json',
+                'Authorization': `Bearer ${token}`
+            };
+            const requestOptions = {
+                method: 'POST',
+                headers: headers,
+                body: JSON.stringify(updateBook) // 'body : JSON.stringify(newBook)' envía el objeto con la información del nuevo libro.
+            };
+            const response = yield fetch(`${this.domain}/api/v1/books/${idCache}`, requestOptions);
+            if (!response.ok) { // manejo de error en caso de no contar con una conexión exitosa. 
+                console.log(response);
+                throw new Error(`error al obtener libros: ${response.status} : ${response.statusText}`);
+            }
+            const bodyResponseUpdateBook = yield response.json();
+            return bodyResponseUpdateBook;
+        });
+    }
+    delete(id, token) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const headers = {
+                'accept': '*/*',
+                'Authorization': `Bearer ${token}`
+            };
+            const requestOptions = {
+                method: 'DELETE',
+                headers: headers,
+            };
+            const response = yield fetch(`${this.domain}/api/v1/books/${id}`, requestOptions);
+            if (!response.ok) { // manejo de error en caso de no contar con una conexión exitosa. 
+                console.log(response);
+                throw new Error(`error al obtener libros: ${response.status} : ${response.statusText}`);
+            }
+            const bodyResponseDeleteBook = yield response.json();
+            return bodyResponseDeleteBook;
         });
     }
 }

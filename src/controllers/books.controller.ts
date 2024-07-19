@@ -32,7 +32,7 @@ export class BooksController {
         return bodyResponseGetAllBooks;
     }
 
-    async createBook(title : HTMLInputElement, author : HTMLInputElement, description : HTMLInputElement, summary : HTMLInputElement, publicationDate : HTMLInputElement, token : string) : Promise <BodyResponseCreateBook> { // función para crear un nuevo libro.
+    async create(title : HTMLInputElement, author : HTMLInputElement, description : HTMLInputElement, summary : HTMLInputElement, publicationDate : HTMLInputElement, token : string) : Promise <BodyResponseCreateBook> { // función para crear un nuevo libro.
 
         const newBook : BodyRequestCreateBook = { // body (objeto) con la información necesaria para crear un nuevo libro.
             title : title.value,

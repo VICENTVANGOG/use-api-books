@@ -11,7 +11,7 @@ export interface Datum { // interface para el objeto que continene la informaci√
     author:          string;
     description:     string;
     summary:         string;
-    publicationDate: Date;
+    publicationDate: string;
     createdBy:       string;
     updatedBy:       null;
     deletedBy:       null;
