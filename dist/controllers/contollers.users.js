@@ -21,17 +21,17 @@ export class UsersController {
                 'accept': '*/*',
                 'Content-Type': 'application/json'
             };
-            const requestOptions = {
+            const reqOptions = {
                 method: 'POST',
                 headers: headers,
-                body: JSON.stringify(userData) // 'JSON.stringify' envía el objeto con la información en formato JSON.
+                body: JSON.stringify(userData)
             };
-            const response = yield fetch(`${this.domain}/api/v1/auth/login`, requestOptions); // conexión con la URL de la API y su endpoint (auth/login). Se le envía el requerimiento (requestOptions).
-            if (!response.ok) { // condición que verifica si la conexión fue exitosa o no. 
-                console.log(`response body: ${((yield response.json()).message)}`); // 'response.json()' devuelve un objeto con la información obtenida de la API y '.message' trae la información de esa propiedad.
-                throw new Error(`error: ${response.status} ${response.statusText}`); // 'throw new Error' permite generar y captutar un mensaje en caso de error (de conexión).
+            const response = yield fetch(`${this.domain}/api/v1/auth/login`, reqOptions);
+            if (!response.ok) {
+                console.log(`Response body: ${(yield response.json()).message}`);
+                throw new Error(`Error: ${response.status}: ${response.statusText}`);
             }
-            const responseBodyLogin = yield response.json(); // se obtiene la información esperada por la API y se transforma a código.
+            const responseBodyLogin = yield response.json();
             return responseBodyLogin;
         });
     }
