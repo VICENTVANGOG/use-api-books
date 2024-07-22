@@ -1,11 +1,9 @@
-// interface para obtener la respuesta de la petici처n 'GET'.
-
-export interface BodyResponseGetAllBooks { // interface con la respuesta al conectar con la API y realizar exitosamente la conexi처n.
+export interface BodyResponseGetAllBooks {
     message: string;
     data:    Datum[];
 }
 
-export interface Datum { // interface para el objeto que continene la informaci처n de 'Datum'.
+export interface Datum {
     id:              string;
     title:           string;
     author:          string;
@@ -21,42 +19,38 @@ export interface Datum { // interface para el objeto que continene la informaci�
     files:           any[];
 }
 
-export interface BodyRequestCreateBook{ // interface con la informaci처n para realizar la petici처n para crear un libro. 
-    title : string,
-    author : string,
-    description : string,
-    summary : string,
-    publicationDate : string 
+export interface BodyRequestCreateBook {
+    title: string,
+    author: string,
+    description: string,
+    summary: string,
+    publicationDate: string
 }
 
-export interface BodyResponseCreateBook { // interface para obetener la informaci처n del libro que fue creado.
-    message : string,
-    data : Record <string, string>
-}
-
+export interface BodyResponseCreateBook {
+    message: string,
+    data: Record<string, string>;
+}  
 
 export interface BodyResponseGetById {
-menssage : string
-data :Record <string, string>
-
-} 
+    message: string,
+    data: Record<string, string>;
+}
 
 export interface BodyRequestUpdateBook {
-    title : string,
-    author : string,
-    description : string,
-    summary : string,
-    publicationDate : string
+    title: string,
+    author: string,
+    description: string,
+    summary: string,
+    publicationDate: string
 }
-
 
 export interface BodyResponseUpdateBook {
-    message : string,
-    data : Record <string, string>
+    message: string,
+    data: Record<string, string>;
 }
 
-
 export interface BodyResponseDeleteBook {
-    message : string,
-    data : null
+    message: string,
+    data: null
 }

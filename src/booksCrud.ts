@@ -1,127 +1,128 @@
-import { cardTemplateController } from "./controllers/cardTemplate.controllers.js";
+// Importación de controladores
+import { CardTemplateController } from "./controllers/cardTemplate.controller.js";
 import { BooksController } from "./controllers/books.controller.js";
 
-const URL_BOOKS: string = 'http://190.147.64.47:5155';
+// Definición de la URL del servidor de libros
+const URL_BOOKS: string = "http://190.147.64.47:5155";
 
-const btnLogout = document.getElementById('btn-logout') as HTMLButtonElement;
-const prevPage = document.getElementById('prev-page') as HTMLButtonElement;
-const nextPage = document.getElementById('next-page') as HTMLButtonElement;
+// Obtención del botón de logout del DOM
+const btnLogout = document.getElementById("btn-logout") as HTMLButtonElement;
 
-const token = localStorage.getItem("authtoken");
+// Obtención de elementos del DOM para navegación entre páginas
+const prevPage = document.getElementById("prev-page") as HTMLButtonElement;
+const nextPage = document.getElementById("next-page") as HTMLButtonElement;
 
+// Obtención del token de autenticación almacenado localmente
+const token = localStorage.getItem("authToken");
+
+// Inicialización de la página actual y límite de libros por página
 let currentPage: number = 1;
 const limit: number = 10;
 
-btnLogout.addEventListener("click", (e: Event) => {
-    localStorage.removeItem("authtoken");
-    window.location.href = "index.html";
+// Evento click en el botón de logout
+btnLogout.addEventListener("click", (e:Event) => {
+    localStorage.removeItem("authToken"); // Remover token de localStorage al hacer logout
+    window.location.href = "index.html"; // Redireccionar a la página de inicio de sesión
 });
 
-if (!token) {
-    alert("El token de autenticación falta. Por favor, inicia sesión.");
-} else {
-    const containerBooks = document.querySelector('.container-books') as HTMLDivElement;
+// Verificar si hay un token de autenticación presente
+if(!token){
+    alert("Authentication token is missing. Please log in."); // Alerta si falta el token de autenticación
+    window.location.href = "index.html"; // Redireccionar a la página de inicio de sesión si falta el token
+}else{
+    // Obtención de elementos del DOM para el formulario de libros
+    const containerBooks = document.querySelector(".container-books") as HTMLDivElement;
     const form = document.querySelector("form") as HTMLFormElement;
-
     const title = document.getElementById("title") as HTMLInputElement;
     const author = document.getElementById("author") as HTMLInputElement;
     const description = document.getElementById("description") as HTMLInputElement;
     const summary = document.getElementById("summary") as HTMLInputElement;
     const publicationDate = document.getElementById("publication-date") as HTMLInputElement;
+    let idCatche: undefined | string; // Variable para almacenar el ID del libro seleccionado
 
-    let idCache: undefined | string;
+    // Instancia del controlador para la plantilla de tarjeta de libros
+    const cardTemplate = new CardTemplateController(containerBooks);
 
-    const cardTemplate = new cardTemplateController(containerBooks);
-
-    prevPage.addEventListener("click", async (e: Event) => {
-        if (currentPage > 1) {
-            currentPage--;
-            await allBooks(limit, currentPage);
+    // Evento click en el botón de página anterior
+    prevPage.addEventListener("click", async (e:Event) =>  {
+        if (currentPage >= 1){
+            currentPage--
+            await allBooks(limit, currentPage); // Llamar a la función para obtener y renderizar libros
         }
     });
 
-    nextPage.addEventListener("click", async (e: Event) => {
-        currentPage++;
-        await allBooks(limit, currentPage);
-    });
-
-    form.addEventListener("submit", async (e: Event) => {
-        e.preventDefault();
-        const crudBooks = new BooksController(URL_BOOKS);
-        const newBook = {
-            title: title.value,
-            author: author.value,
-            description: description.value,
-            summary: summary.value,
-            publicationDate: publicationDate.value,
-        };
-
-        try {
-            if (idCache == undefined) {
-                await crudBooks.create(title, author, description, summary, publicationDate, token as string);
-            } else {
-                await crudBooks.update(idCache, title, author, description, summary, publicationDate, token as string);
-                idCache = undefined;
-            }
-            form.reset();
-            await allBooks(limit, currentPage);
-        } catch (error) {
-            console.error("Error saving book:", error);
+    // Evento click en el botón de página siguiente
+    nextPage.addEventListener("click", async (e:Event) =>  {
+        if (currentPage >= 1){
+            currentPage++
+            await allBooks(limit, currentPage); // Llamar a la función para obtener y renderizar libros
         }
     });
 
-    containerBooks.addEventListener("click", async (e: Event) => {
-        if (e.target instanceof HTMLButtonElement) {
-            const crudBooks = new BooksController(URL_BOOKS);
+    // Evento submit del formulario de libros
+    form.addEventListener("submit", async (e:Event)=>{
+        e.preventDefault(); // Prevenir el comportamiento por defecto del formulario
+        const crudBooks = new BooksController(URL_BOOKS); // Instancia del controlador de libros
 
-            if (e.target.classList.contains("btn-warning")) {
-                idCache = e.target.dataset.id;
-            }
+        if(idCatche === undefined){
+            await crudBooks.create(title, author, description, summary, publicationDate, token as string); // Crear un nuevo libro
+        }else{
+            await crudBooks.update(idCatche, title, author, description, summary, publicationDate, token as string); // Actualizar un libro existente
+            idCatche = undefined; // Limpiar el ID almacenado
+        }
+        form.reset(); // Reiniciar el formulario
+        await allBooks(limit, currentPage); // Actualizar la lista de libros después de la operación
+    });
 
-            if (idCache) {
-                try {
-                    const book = await crudBooks.getById(idCache, token as string);
-                    title.value = book.data.title;
+    // Evento click en el contenedor de libros para editar o eliminar libros
+    containerBooks.addEventListener("click", async (e:Event)=>{
+        if(e.target instanceof HTMLButtonElement){
+            const crudBooks = new BooksController(URL_BOOKS); // Instancia del controlador de libros
+
+            if(e.target.classList.contains("btn-warning")){
+                idCatche = e.target.dataset.id; // Obtener el ID del libro seleccionado para edición
+
+                if(idCatche){
+                    const book = await crudBooks.getById(idCatche, token as string); // Obtener los detalles del libro
+                    title.value = book.data.title; // Llenar el formulario con los detalles del libro
                     author.value = book.data.author;
                     description.value = book.data.description;
                     summary.value = book.data.summary;
                     publicationDate.value = book.data.publicationDate;
-                } catch (error) {
-                    console.error("Error fetching book:", error);
                 }
-            } else if (e.target.classList.contains("btn-danger")) {
-                const bookId = e.target.dataset.id;
+            } else if (e.target.classList.contains("btn-danger")){
+                let bookId = e.target.dataset.id; // Obtener el ID del libro seleccionado para eliminación
 
-                if (bookId) {
-                    const confirmDelete = confirm("Are you sure you want to delete?");
-
-                    if (confirmDelete) {
-                        try {
-                            await crudBooks.delete(bookId, token as string);
-                            await allBooks(limit, currentPage);
-                        } catch (error) {
-                            console.error("Error deleting book:", error);
-                        }
+                if(bookId){
+                    const confirmDelete = confirm("Are you sure you want to delete?"); // Confirmar la eliminación
+                    if(confirmDelete){
+                        await crudBooks.delete(bookId, token as string); // Eliminar el libro
+                        idCatche = undefined; // Limpiar el ID almacenado
+                        await allBooks(limit, currentPage); // Actualizar la lista de libros después de la operación
                     }
                 }
             }
         }
     });
 
-    async function allBooks(limit: number, currentPage: number) {
-        const crudBooks = new BooksController(URL_BOOKS);
-        try {
-            const response = await crudBooks.getAllBooks(token as string, limit, currentPage);
-            const books = response.data;
+    // Función asincrónica para obtener y renderizar todos los libros
+    async function allBooks(limit: number, currentPage: number){
+        const crudBooks = new BooksController(URL_BOOKS); // Instancia del controlador de libros
+        try{
+            const response = await crudBooks.allBooks(token as string, limit, currentPage); // Obtener todos los libros
+            console.log(`Respuesta de allBooks ${response}`); // Imprimir la respuesta en la consola
+            const books = response.data; // Obtener los datos de los libros
 
-            containerBooks.innerHTML = ''; // Limpiar el contenedor antes de renderizar nuevos libros
-            for (const book of books) {
-                cardTemplate.render(book.id, book.title, book.author, book.description, book.summary, book.publicationDate);
+            containerBooks.innerHTML = ''; // Limpiar el contenedor de libros
+
+            for (const book of books){
+                cardTemplate.render(book.id, book.title, book.author, book.description, book.summary, book.publicationDate); // Renderizar cada libro en la plantilla de tarjeta
             }
+
         } catch (error) {
-            console.error("Error fetching books:", error);
+            console.error("Error fetching books:", error); // Manejar errores en la obtención de libros
         }
     }
 
-    allBooks(limit, currentPage);
+    allBooks(limit, currentPage); // Llamar a la función para obtener y renderizar libros al cargar la página
 }
