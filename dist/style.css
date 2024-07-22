@@ -23,13 +23,13 @@ body {
     text-align: start;
 }
 
-/* Estilos para el formulario */
+
 .form-group {
     margin-bottom: 15px;
 }
 
 .form-control {
-    width: 100%;
+    width: 95%;
     padding: 10px;
     font-size: 16px;
     border: 1px solid #ccc;
@@ -50,7 +50,6 @@ body {
     background-color: #218838;
 }
 
-/* Estilos para el enlace */
 a {
     display: block;
     text-align: center;
